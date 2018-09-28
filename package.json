@@ -1,0 +1,43 @@
+{
+  "name": "tencent-smartiot",
+  "version": "0.2.12",
+  "description": "tencent cloud smartiot js sdk",
+  "main": "src/sdk.js",
+  "browser": "./dist/iot_sdk.browser.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tencentyun/smartiot-js-sdk.git"
+  },
+  "keywords": [
+    "iot"
+  ],
+  "author": "alsotang <alsotang@tencent.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tencentyun/smartiot-js-sdk/issues"
+  },
+  "homepage": "https://github.com/tencentyun/smartiot-js-sdk#readme",
+  "devDependencies": {
+    "@babel/core": "^7.0.0-beta.49",
+    "@babel/preset-env": "^7.0.0-beta.49",
+    "babel-loader": "^8.0.0-beta.3",
+    "delay": "^3.0.0",
+    "intelli-espower-loader": "^1.0.1",
+    "mocha": "^5.2.0",
+    "nock": "^9.2.6",
+    "power-assert": "^1.6.0",
+    "webpack": "4.19.x",
+    "webpack-cli": "^2.1.5",
+    "webpack-merge": "^4.1.2",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "debug": "^3.1.0",
+    "ws": "^5.2.2"
+  }
+}
