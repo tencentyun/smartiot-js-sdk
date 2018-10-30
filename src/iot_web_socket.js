@@ -5,11 +5,11 @@ const helper = require('./helper')
 const errorCode = require('./error_code')
 
 class IotWebSocket extends EventEmitter {
-  constructor(url, options) {
+  constructor(options) {
     super();
 
-    this.url = url || 'wss://ws.qcloudsmartiot.com/'
     this.options = options || {}
+    this.url = options.url || 'wss://ws.qcloudsmartiot.com/'
     // 心跳的间隔时间
     this.hearbeatInterval = this.options.hearbeatInterval || 20 * 1000
     this.reconnectInterval = this.options.reconnectInterval || 1 * 1000;
@@ -128,10 +128,6 @@ class IotWebSocket extends EventEmitter {
     debug(`call action %o, params %o`, action, params);
     const self = this;
 
-    params = params || {}
-
-    const callTimeout = params.callTimeout || self.callTimeout;
-
     const successP = new Promise(function (resolve, reject) {
       const reqId = self.reqIdCount++
       const message = JSON.stringify({
@@ -151,7 +147,7 @@ class IotWebSocket extends EventEmitter {
         const e = new Error(`call timeout. action: ${action}`)
         e.code = errorCode.SMARTIOT_TIMEOUT
         reject(e)
-      }, callTimeout)
+      }, self.callTimeout)
     })
 
     return Promise.race([successP, timeoutP])

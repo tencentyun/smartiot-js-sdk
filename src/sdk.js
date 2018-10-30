@@ -15,7 +15,7 @@ class Sdk {
     this.AccessToken = options.AccessToken;
 
     this.request = new Request()
-    this.ws = new IotWebSocket(options.wsUrl)
+    this.ws = new IotWebSocket(options.wsOptions)
 
     this.init()
   }

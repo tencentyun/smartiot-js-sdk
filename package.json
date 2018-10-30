@@ -1,6 +1,6 @@
 {
   "name": "tencent-smartiot",
-  "version": "0.2.13",
+  "version": "0.2.14",
   "description": "tencent cloud smartiot js sdk",
   "main": "src/sdk.js",
   "browser": "./dist/iot_sdk.browser.js",

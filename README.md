@@ -62,6 +62,8 @@ main()
 
 `AccessToken`：登录之后服务器会返回 AccessToken，用于标记一个用户的会话。这个参数也可以后面再通过 bindAccessToken 传入。
 
+`wsOptions`：针对sdk封装的ws客户端进行配置，请看源码中的 `iot_web_socket.js` 文件。
+
 ```js
 new SDK({
   AppKey: 'xxxx',
