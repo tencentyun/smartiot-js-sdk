@@ -2923,6 +2923,17 @@ exports.isRN = function () {
 
 /***/ }),
 
+/***/ "./src/error_code.js":
+/*!***************************!*\
+  !*** ./src/error_code.js ***!
+  \***************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+exports.SMARTIOT_TIMEOUT = 'SMARTIOT_TIMEOUT';
+
+/***/ }),
+
 /***/ "./src/helper.js":
 /*!***********************!*\
   !*** ./src/helper.js ***!
@@ -3017,19 +3028,21 @@ var debug = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.j
 
 var helper = __webpack_require__(/*! ./helper */ "./src/helper.js");
 
+var errorCode = __webpack_require__(/*! ./error_code */ "./src/error_code.js");
+
 var IotWebSocket =
 /*#__PURE__*/
 function (_EventEmitter) {
   _inherits(IotWebSocket, _EventEmitter);
 
-  function IotWebSocket(url, options) {
+  function IotWebSocket(options) {
     var _this;
 
     _classCallCheck(this, IotWebSocket);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(IotWebSocket).call(this));
-    _this.url = url || 'wss://ws.qcloudsmartiot.com/';
-    _this.options = options || {}; // 心跳的间隔时间
+    _this.options = options || {};
+    _this.url = options.url || 'wss://ws.qcloudsmartiot.com/'; // 心跳的间隔时间
 
     _this.hearbeatInterval = _this.options.hearbeatInterval || 20 * 1000;
     _this.reconnectInterval = _this.options.reconnectInterval || 1 * 1000;
@@ -3038,7 +3051,8 @@ function (_EventEmitter) {
 
     _this.reqIdCount = 0; // 记录 reqId 对应的处理函数
 
-    _this.reqIdCallbacks = {}; // 记录绑定的所有函数，在重启的时候恢复
+    _this.reqIdCallbacks = {};
+    _this.callTimeout = _this.options.callTimeout || 5000; // 记录绑定的所有函数，在重启的时候恢复
 
     _this.onOpenCallbacks = [];
     _this.onCloseCallbacks = [];
@@ -3140,7 +3154,7 @@ function (_EventEmitter) {
     value: function call(action, params) {
       debug("call action %o, params %o", action, params);
       var self = this;
-      return new Promise(function (resolve, reject) {
+      var successP = new Promise(function (resolve, reject) {
         var reqId = self.reqIdCount++;
         var message = JSON.stringify({
           action: action,
@@ -3153,7 +3167,16 @@ function (_EventEmitter) {
         };
 
         self.send(message);
+      }); // 在成功和超时的promises之间，取最早返回的那个
+
+      var timeoutP = new Promise(function (resolve, reject) {
+        setTimeout(function () {
+          var e = new Error("call timeout. action: ".concat(action));
+          e.code = errorCode.SMARTIOT_TIMEOUT;
+          reject(e);
+        }, self.callTimeout);
       });
+      return Promise.race([successP, timeoutP]);
     }
   }, {
     key: "send",
@@ -3475,7 +3498,7 @@ function () {
     this.AppKey = options.AppKey;
     this.AccessToken = options.AccessToken;
     this.request = new Request();
-    this.ws = new IotWebSocket(options.wsUrl);
+    this.ws = new IotWebSocket(options.wsOptions);
     this.init();
   }
 
