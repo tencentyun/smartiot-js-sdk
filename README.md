@@ -79,6 +79,8 @@ new SDK({
 
 云api的文档在：https://cloud.tencent.com/document/product/568/16436
 
+默认的超时时间为5s，超时会抛错。
+
 ### bindAccessToken(AccessToken)
 
 登录之后，调用这个接口绑定 AccessToken。这样在调用云api任何接口时，都会自动传 AccessToken 参数。如果需要暂时忽略 AccessToken 参数，则在 `callYunApi` 时，传入 `options.WithAccessToken=false`

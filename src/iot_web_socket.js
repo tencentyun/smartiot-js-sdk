@@ -2,6 +2,7 @@ const EventEmitter = require('events');
 const MyWebSocket = require('./my_web_socket')
 const debug = require('debug')('iot:iot_web_socket')
 const helper = require('./helper')
+const errorCode = require('./error_code')
 
 class IotWebSocket extends EventEmitter {
   constructor(url, options) {
@@ -19,6 +20,7 @@ class IotWebSocket extends EventEmitter {
     this.reqIdCount = 0;
     // 记录 reqId 对应的处理函数
     this.reqIdCallbacks = {}
+    this.callTimeout = this.options.callTimeout || 5000;
 
     // 记录绑定的所有函数，在重启的时候恢复
     this.onOpenCallbacks = []
@@ -126,7 +128,11 @@ class IotWebSocket extends EventEmitter {
     debug(`call action %o, params %o`, action, params);
     const self = this;
 
-    return new Promise(function (resolve, reject) {
+    params = params || {}
+
+    const callTimeout = params.callTimeout || self.callTimeout;
+
+    const successP = new Promise(function (resolve, reject) {
       const reqId = self.reqIdCount++
       const message = JSON.stringify({
         action: action,
@@ -138,6 +144,17 @@ class IotWebSocket extends EventEmitter {
       }
       self.send(message)
     })
+
+    // 在成功和超时的promises之间，取最早返回的那个
+    const timeoutP = new Promise(function (resolve, reject) {
+      setTimeout(function () {
+        const e = new Error(`call timeout. action: ${action}`)
+        e.code = errorCode.SMARTIOT_TIMEOUT
+        reject(e)
+      }, callTimeout)
+    })
+
+    return Promise.race([successP, timeoutP])
   }
 
   send(data) {
