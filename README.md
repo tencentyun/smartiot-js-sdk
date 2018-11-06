@@ -89,6 +89,33 @@ new SDK({
 
 登录方式有多种，请参照 API 文档中的登录部分，并通过 `callYunApi` 进行登录。
 
+
+### activePush()
+
+当 `bindAccessToken` 之后，即可调用此方法来开启服务端推送。
+每当用户名下的设备发生数据变动时，则会推送消息过来。
+
+与 `onPush` 方法结合使用
+
+### onPush(fn)
+
+当服务端推送消息时，会调用 `fn(pushEvent)`，pushEvent格式如下
+
+```js
+({ 
+  action: 'DeviceChange',
+  params: { 
+    Type: 'control',
+    Ts: 1541512121555,
+    ProductId: 'iot-b87oxqbs',
+    DeviceName: 'test-app-device',
+    PIDN: 'iot-b87oxqbs/test-app-device',
+    Data: { smart6: 1 }
+  },
+  push: true 
+})
+```
+
 ## license
 
 MIT
