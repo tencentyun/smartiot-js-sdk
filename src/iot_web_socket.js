@@ -127,9 +127,9 @@ class IotWebSocket extends EventEmitter {
   call(action, params) {
     debug(`call action %o, params %o`, action, params);
     const self = this;
+    const reqId = self.reqIdCount++
 
     const successP = new Promise(function (resolve, reject) {
-      const reqId = self.reqIdCount++
       const message = JSON.stringify({
         action: action,
         reqId: reqId,
@@ -146,6 +146,7 @@ class IotWebSocket extends EventEmitter {
       setTimeout(function () {
         const e = new Error(`call timeout. action: ${action}`)
         e.code = errorCode.SMARTIOT_TIMEOUT
+        delete self.reqIdCallbacks[reqId];
         reject(e)
       }, self.callTimeout)
     })

@@ -3154,8 +3154,8 @@ function (_EventEmitter) {
     value: function call(action, params) {
       debug("call action %o, params %o", action, params);
       var self = this;
+      var reqId = self.reqIdCount++;
       var successP = new Promise(function (resolve, reject) {
-        var reqId = self.reqIdCount++;
         var message = JSON.stringify({
           action: action,
           reqId: reqId,
@@ -3173,6 +3173,7 @@ function (_EventEmitter) {
         setTimeout(function () {
           var e = new Error("call timeout. action: ".concat(action));
           e.code = errorCode.SMARTIOT_TIMEOUT;
+          delete self.reqIdCallbacks[reqId];
           reject(e);
         }, self.callTimeout);
       });
